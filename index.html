@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>사업 구조 프로토타입</title>
+<style>
+  * { box-sizing: border-box; }
+
+  :root {
+    --bg: #fbf9f6;
+    --dr: #ffd6d6;      /* 파스텔 코랄 */
+    --gridwiz: #d6e8ff; /* 파스텔 블루 */
+    --pv: #fff2c2;      /* 파스텔 옐로우 */
+    --ess: #d9f2e6;     /* 파스텔 민트 */
+    --ev: #e6d9f7;      /* 파스텔 라벤더 */
+    --text: #4a4640;
+    --shadow: rgba(80, 60, 60, 0.14);
+  }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif;
+    background: radial-gradient(circle at 30% 20%, #fffaf3 0%, var(--bg) 60%);
+    overflow: hidden;
+  }
+
+  #stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ---------- 메인 화면 ---------- */
+  #main-view {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+
+  #main-view.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .circle-grid {
+    position: relative;
+    width: 700px;
+    height: 520px;
+  }
+
+  .circle {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 10px 24px var(--shadow), inset 0 -6px 12px rgba(255,255,255,0.5);
+    animation: float 6s ease-in-out infinite;
+    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s ease;
+  }
+
+  .circle:hover {
+    transform: scale(1.08) translateY(-4px);
+    box-shadow: 0 16px 30px var(--shadow), inset 0 -6px 12px rgba(255,255,255,0.6);
+  }
+
+  .circle:active {
+    transform: scale(0.97);
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .circle:hover { animation-play-state: paused; }
+
+  #node-dr      { top: 0;    left: 260px; background: var(--dr);      animation-delay: 0s; }
+  #node-gridwiz { top: 170px; left: 260px; background: var(--gridwiz); animation-delay: 1.2s; }
+  #node-pv      { top: 340px; left: 260px; background: var(--pv);     animation-delay: 2.4s; }
+  #node-ess     { top: 170px; left: 20px;  background: var(--ess);    animation-delay: 0.6s; }
+  #node-ev      { top: 170px; left: 500px; background: var(--ev);     animation-delay: 1.8s; }
+
+  /* 클릭한 원이 화면 전체로 확장되는 애니메이션용 클론 */
+  #expand-clone {
+    position: fixed;
+    border-radius: 50%;
+    z-index: 20;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: var(--text);
+    box-shadow: 0 10px 24px var(--shadow);
+  }
+
+  /* ---------- DR 상세 화면 ---------- */
+  #dr-view {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, #fff5f5 0%, var(--bg) 100%);
+    transition: opacity 0.3s ease;
+  }
+
+  #dr-view.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .back-btn {
+    position: absolute;
+    top: 28px;
+    left: 28px;
+    padding: 10px 20px;
+    background: #ffffffcc;
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    box-shadow: 0 4px 12px var(--shadow);
+    transition: transform 0.2s ease, background 0.2s ease;
+    opacity: 0;
+  }
+  .back-btn:hover { background: #ffffff; transform: translateX(-2px); }
+  #dr-view.visible .back-btn {
+    animation: fadeIn 0.4s ease 0.5s forwards;
+  }
+
+  .dr-title {
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 48px;
+    color: var(--text);
+    letter-spacing: 1px;
+    opacity: 0;
+  }
+  #dr-view.visible .dr-title {
+    animation: fadeUp 0.5s ease 0.35s forwards;
+  }
+
+  .sub-circle-row {
+    display: flex;
+    gap: 56px;
+  }
+
+  .sub-circle {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: #ffe4e4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    box-shadow: 0 8px 20px var(--shadow), inset 0 -6px 12px rgba(255,255,255,0.5);
+    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s ease;
+    opacity: 0;
+    transform: translateY(16px) scale(0.9);
+  }
+
+  .sub-circle:nth-child(1) { background: #ffe4e4; }
+  .sub-circle:nth-child(2) { background: #ffe9d6; }
+  .sub-circle:nth-child(3) { background: #ffdcef; }
+
+  #dr-view.visible .sub-circle {
+    animation: popIn 0.45s cubic-bezier(.34,1.56,.64,1) forwards;
+  }
+  #dr-view.visible .sub-circle:nth-child(1) { animation-delay: 0.55s; }
+  #dr-view.visible .sub-circle:nth-child(2) { animation-delay: 0.68s; }
+  #dr-view.visible .sub-circle:nth-child(3) { animation-delay: 0.81s; }
+
+  .sub-circle:hover {
+    transform: scale(1.08) translateY(-4px);
+    box-shadow: 0 14px 26px var(--shadow), inset 0 -6px 12px rgba(255,255,255,0.6);
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+  @keyframes fadeUp {
+    to { opacity: 1; }
+  }
+  @keyframes popIn {
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+</style>
+</head>
+<body>
+
+<div id="stage">
+
+  <!-- 메인 화면 -->
+  <div id="main-view">
+    <div class="circle-grid">
+      <div class="circle" id="node-dr" onclick="showDR(event)">DR</div>
+      <div class="circle" id="node-gridwiz">그리드위즈</div>
+      <div class="circle" id="node-pv">PV</div>
+      <div class="circle" id="node-ess">ESS</div>
+      <div class="circle" id="node-ev">EV</div>
+    </div>
+  </div>
+
+  <!-- DR 확장 화면 -->
+  <div id="dr-view">
+    <button class="back-btn" onclick="showMain()">← 뒤로</button>
+    <div class="dr-title">DR</div>
+    <div class="sub-circle-row">
+      <div class="sub-circle">DR+ESS</div>
+      <div class="sub-circle">DR+EM</div>
+      <div class="sub-circle">DR+PV</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function showDR(e) {
+    const source = document.getElementById('node-dr');
+    const rect = source.getBoundingClientRect();
+    const clone = document.createElement('div');
+    clone.id = 'expand-clone';
+    clone.style.background = getComputedStyle(source).backgroundColor;
+    clone.style.left = rect.left + 'px';
+    clone.style.top = rect.top + 'px';
+    clone.style.width = rect.width + 'px';
+    clone.style.height = rect.height + 'px';
+    clone.style.transition = 'all 0.5s cubic-bezier(.65,0,.35,1)';
+    document.body.appendChild(clone);
+
+    // 다음 프레임에 화면 전체 크기로 확장
+    requestAnimationFrame(() => {
+      const size = Math.max(window.innerWidth, window.innerHeight) * 2.2;
+      clone.style.left = (window.innerWidth / 2 - size / 2) + 'px';
+      clone.style.top = (window.innerHeight / 2 - size / 2) + 'px';
+      clone.style.width = size + 'px';
+      clone.style.height = size + 'px';
+      clone.style.borderRadius = '50%';
+    });
+
+    document.getElementById('main-view').classList.add('hidden');
+
+    setTimeout(() => {
+      document.getElementById('dr-view').classList.add('visible');
+    }, 320);
+
+    setTimeout(() => {
+      clone.remove();
+    }, 550);
+  }
+
+  function showMain() {
+    document.getElementById('dr-view').classList.remove('visible');
+    // 리셋: 사라졌던 sub-circle 애니메이션 재생을 위해 클래스 재적용
+    const drView = document.getElementById('dr-view');
+    drView.style.transition = 'none';
+    setTimeout(() => {
+      drView.style.transition = '';
+      document.getElementById('main-view').classList.remove('hidden');
+    }, 50);
+  }
+</script>
+
+</body>
+</html>
