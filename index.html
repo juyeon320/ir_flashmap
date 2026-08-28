@@ -48,8 +48,8 @@
 
   .circle-grid {
     position: relative;
-    width: 700px;
-    height: 520px;
+    width: 860px;
+    height: 700px;
   }
 
   .circle {
@@ -79,17 +79,24 @@
     transform: scale(0.97);
   }
 
+  .circle img {
+    width: 68%;
+    height: auto;
+    object-fit: contain;
+    pointer-events: none;
+  }
+
   @keyframes float {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-6px); }
   }
   .circle:hover { animation-play-state: paused; }
 
-  #node-dr      { top: 0;    left: 260px; background: var(--dr);      animation-delay: 0s; }
-  #node-gridwiz { top: 170px; left: 260px; background: var(--gridwiz); animation-delay: 1.2s; }
-  #node-pv      { top: 340px; left: 260px; background: var(--pv);     animation-delay: 2.4s; }
-  #node-ess     { top: 170px; left: 20px;  background: var(--ess);    animation-delay: 0.6s; }
-  #node-ev      { top: 170px; left: 500px; background: var(--ev);     animation-delay: 1.8s; }
+  #node-dr      { top: 0;    left: 340px; background: var(--dr);      animation-delay: 0s; }
+  #node-gridwiz { top: 260px; left: 340px; background: var(--gridwiz); animation-delay: 1.2s; }
+  #node-pv      { top: 520px; left: 340px; background: var(--pv);     animation-delay: 2.4s; }
+  #node-ess     { top: 260px; left: 40px;  background: var(--ess);    animation-delay: 0.6s; }
+  #node-ev      { top: 260px; left: 640px; background: var(--ev);     animation-delay: 1.8s; }
 
   /* 클릭한 원이 화면 전체로 확장되는 애니메이션용 클론 */
   #expand-clone {
@@ -159,7 +166,7 @@
 
   .sub-circle-row {
     display: flex;
-    gap: 56px;
+    gap: 90px;
   }
 
   .sub-circle {
@@ -215,7 +222,7 @@
   <div id="main-view">
     <div class="circle-grid">
       <div class="circle" id="node-dr" onclick="showDR(event)">DR</div>
-      <div class="circle" id="node-gridwiz">그리드위즈</div>
+      <div class="circle" id="node-gridwiz"><img src="assets/gridwiz_logo.jpg" alt="그리드위즈"></div>
       <div class="circle" id="node-pv">PV</div>
       <div class="circle" id="node-ess">ESS</div>
       <div class="circle" id="node-ev">EV</div>
